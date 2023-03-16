@@ -12,7 +12,7 @@
 - CongestionTaxCalculator.getTax(..) does not return correctly for lists comprising more than one 24-hour period.
 - Vehicle type is currently not included in http call. 
 - Integration tests of http call lacking.
-- External config of peried tax charges currently hard coded. File 'charges.csv' should be read into a dynamic list consisting of TaxTimeInterval instances and calculation logic be adapted to this.
+- External config of period tax charges currently hard coded. File 'charges.csv' should be read into a dynamic list consisting of TaxTimeInterval instances and calculation logic be adapted to this.
 
 # Done
 - Put existing code in a basic Spring Boot project to get http functionality

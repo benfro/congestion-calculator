@@ -1,15 +1,21 @@
-package net.benfro.concalc.service;
+package net.benfro.concalc.config.gothenburg;
 
+import net.benfro.concalc.ruleapi.TollFreeDateLookup;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+@SpringBootTest
+class TollFreeDateLookupTest {
 
-class TaxDateServiceTest {
 
-    TaxDateService instance;
+    @Autowired
+    TollFreeDateLookup tollFreeDateLookup;
 
 
     @ParameterizedTest
@@ -33,8 +39,7 @@ class TaxDateServiceTest {
             "2013-12-31",
     })
     void shouldBeTaxFree2013(LocalDate localDate) {
-        instance = new TaxDateService();
-        assertTrue(instance.isTollFreeDate(localDate));
+        assertTrue(tollFreeDateLookup.isTollFreeDate(localDate));
     }
 
     @ParameterizedTest
@@ -44,7 +49,6 @@ class TaxDateServiceTest {
             "2013-12-13",
     })
     void shouldNotBeTaxFree2013(LocalDate localDate) {
-        instance = new TaxDateService();
-        assertFalse(instance.isTollFreeDate(localDate));
+        assertFalse(tollFreeDateLookup.isTollFreeDate(localDate));
     }
 }

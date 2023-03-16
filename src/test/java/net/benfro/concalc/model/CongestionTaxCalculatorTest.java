@@ -1,10 +1,9 @@
 package net.benfro.concalc.model;
 
-import net.benfro.concalc.model.CongestionTaxCalculator;
-import net.benfro.concalc.model.DefaultVehicle;
-import net.benfro.concalc.model.Vehicle;
-import net.benfro.concalc.service.TaxDateService;
-import net.benfro.concalc.service.VehicleService;
+import net.benfro.concalc.ruleapi.TollFeeLookup;
+import net.benfro.concalc.ruleapi.TollFreeDateLookup;
+import net.benfro.concalc.ruleapi.TollFreeVehicleLookup;
+import net.benfro.concalc.service.TollFeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,23 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CongestionTaxCalculatorTest {
 
     @Autowired
-    TaxDateService taxDateService;
+    TollFreeDateLookup tollFreeDateLookup;
 
     @Autowired
-    List<Vehicle> taxFreeVehicles;
+    TollFreeVehicleLookup taxFreeVehicles;
 
-    VehicleService vehicleService;
+    @Autowired
+    TollFeeLookup tollFeeLookup;
 
     CongestionTaxCalculator instance;
 
     @BeforeEach
     void setUp() {
-        instance = new CongestionTaxCalculator(new VehicleService(taxDateService, taxFreeVehicles));
-    }
-
-    @Test
-    void testCalculateTax() {
-        assertEquals(4, taxFreeVehicles.size());
+        instance = new CongestionTaxCalculator(new TollFeeService(tollFreeDateLookup, taxFreeVehicles, tollFeeLookup));
     }
 
 

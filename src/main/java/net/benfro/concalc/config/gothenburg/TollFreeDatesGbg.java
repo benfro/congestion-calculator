@@ -1,18 +1,16 @@
-package net.benfro.concalc.service;
+package net.benfro.concalc.config.gothenburg;
 
-import org.springframework.stereotype.Service;
+import net.benfro.concalc.ruleapi.TollFreeDateLookup;
+import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
-import java.util.Date;
 
-@Service
-public class TaxDateService {
-
+@Component
+public class TollFreeDatesGbg implements TollFreeDateLookup {
+    @Override
     public boolean isTollFreeDate(LocalDate date) {
-
         final int year = date.getYear();
         final DayOfWeek day = date.getDayOfWeek();
         final Month month = date.getMonth();
@@ -33,15 +31,5 @@ public class TaxDateService {
             }
         }
         return false;
-    }
-
-    public static Date convertToDate(LocalDate localDate) {
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
-
-    public static LocalDate convertToLocalDate(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
     }
 }

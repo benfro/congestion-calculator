@@ -1,7 +1,7 @@
 package net.benfro.concalc.model;
 
 import lombok.RequiredArgsConstructor;
-import net.benfro.concalc.service.VehicleService;
+import net.benfro.concalc.service.TollFeeService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CongestionTaxCalculator {
 
-    private final VehicleService vehicleService;
+    private final TollFeeService tollFeeService;
 
     public int getTax(Vehicle vehicle, List<String> dateTimes) {
 
@@ -32,7 +32,7 @@ public class CongestionTaxCalculator {
                 totalTax += findMaxTaxFromEntries(entriesWithinSixtyMinutes, vehicle);
                 collect.removeAll(collect);
             } else {
-                totalTax += vehicleService.getTollFee(pop, vehicle);
+                totalTax += tollFeeService.getTollFee(pop, vehicle);
             }
         }
 
@@ -40,7 +40,7 @@ public class CongestionTaxCalculator {
     }
 
     private int findMaxTaxFromEntries(List<LocalDateTime> entriesWithinSixtyMinutes, Vehicle vehicle) {
-        return entriesWithinSixtyMinutes.stream().mapToInt(d -> vehicleService.getTollFee(d, vehicle)).max().orElse(0);
+        return entriesWithinSixtyMinutes.stream().mapToInt(d -> tollFeeService.getTollFee(d, vehicle)).max().orElse(0);
     }
 
     private List<LocalDateTime> findEntriesWithinSixtyMinutes(LocalDateTime ldt, List<LocalDateTime> collect) {

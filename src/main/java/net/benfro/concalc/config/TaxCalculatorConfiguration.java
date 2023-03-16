@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 @Configuration
 public class TaxCalculatorConfiguration {
 
-    @Value("${tax-free-vehicles}") List<String> beanName;
+    @Value("${tax-free-vehicles}") List<String> taxFreeVehicleNames;
 
     @Value("${max-tax-per-day}") int maxTaxPerDay;
 
     @Bean
     public List<Vehicle> taxFreeVehicles() {
-        return beanName.stream().map(DefaultVehicle::get).collect(Collectors.toList());
+        return taxFreeVehicleNames.stream().map(DefaultVehicle::get).collect(Collectors.toList());
     }
 }
