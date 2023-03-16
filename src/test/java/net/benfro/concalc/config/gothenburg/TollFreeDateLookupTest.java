@@ -1,7 +1,6 @@
 package net.benfro.concalc.config.gothenburg;
 
 import net.benfro.concalc.ruleapi.TollFreeDateLookup;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;

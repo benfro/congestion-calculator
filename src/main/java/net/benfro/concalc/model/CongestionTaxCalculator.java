@@ -17,22 +17,23 @@ public class CongestionTaxCalculator {
 
     public int getTax(Vehicle vehicle, List<String> dateTimes) {
 
-        final LinkedList<LocalDateTime> collect = new LinkedList<LocalDateTime>(dateTimes.stream().map(d -> getAsLocalDateTime(d)).collect(Collectors.toList()));
-
-        // Sort it
-        collect.sort(Comparator.naturalOrder());
+        final LinkedList<LocalDateTime> sortedDateTimes = dateTimes
+                .stream()
+                .map(this::getAsLocalDateTime)
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toCollection(LinkedList::new));
 
         int totalTax = 0;
 
         // Get the ones within sixty minutes - return highest tax
-        while (!collect.isEmpty()) {
-            final LocalDateTime pop = collect.pop();
-            final List<LocalDateTime> entriesWithinSixtyMinutes = findEntriesWithinSixtyMinutes(pop, collect);
+        while (!sortedDateTimes.isEmpty()) {
+            final LocalDateTime latestDate = sortedDateTimes.pop();
+            final List<LocalDateTime> entriesWithinSixtyMinutes = findEntriesWithinSixtyMinutes(latestDate, sortedDateTimes);
             if (!entriesWithinSixtyMinutes.isEmpty()) {
                 totalTax += findMaxTaxFromEntries(entriesWithinSixtyMinutes, vehicle);
-                collect.removeAll(collect);
+                sortedDateTimes.clear();
             } else {
-                totalTax += tollFeeService.getTollFee(pop, vehicle);
+                totalTax += tollFeeService.getTollFee(latestDate, vehicle);
             }
         }
 
@@ -43,8 +44,8 @@ public class CongestionTaxCalculator {
         return entriesWithinSixtyMinutes.stream().mapToInt(d -> tollFeeService.getTollFee(d, vehicle)).max().orElse(0);
     }
 
-    private List<LocalDateTime> findEntriesWithinSixtyMinutes(LocalDateTime ldt, List<LocalDateTime> collect) {
-        return collect.stream().filter(t -> t.isBefore(ldt.plusMinutes(60))).collect(Collectors.toList());
+    private List<LocalDateTime> findEntriesWithinSixtyMinutes(LocalDateTime baseTime, List<LocalDateTime> collect) {
+        return collect.stream().filter(t -> t.isBefore(baseTime.plusMinutes(60))).collect(Collectors.toList());
     }
 
     private LocalDateTime getAsLocalDateTime(String in) {

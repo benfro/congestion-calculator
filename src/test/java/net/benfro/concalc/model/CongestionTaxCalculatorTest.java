@@ -41,15 +41,32 @@ class CongestionTaxCalculatorTest {
     @ParameterizedTest
     @CsvSource(value = {
             "Bil, 2013-01-01 22:03:27, 2013-01-01 10:03:27, 0",
+            "Bil, 2013-01-01 22:03:27, 2013-01-02 06:00:27, 8",
             "Bil, 2013-01-02 06:03:27, 2013-01-02 18:03:27, 16",
             "Bil, 2013-01-02 06:03:27, 2013-01-02 06:33:27, 13",
             "Bil, 2013-01-02 06:03:27, 2013-01-02 15:33:27, 26",
+            "Bil, 2013-01-02 06:33:27, 2013-01-03 07:01:27, 31",
     })
-    void testIt(String vehicle, String date1, String date2, int expected) {
+    void testAdditiveFee(String vehicle, String date1, String date2, int expected) {
         List<String> dates = new ArrayList<>();
         dates.add(date1);
         dates.add(date2);
-        assertEquals(expected, instance.getTax(DefaultVehicle.get("Bil"), dates));
+        assertEquals(expected, instance.getTax(DefaultVehicle.get(vehicle), dates));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            //"Bil, 2013-01-01 22:03:27, 2013-01-01 10:03:27, 0",
+            //"Bil, 2013-01-02 06:03:27, 2013-01-02 18:03:27, 16",
+            "Bil, 2013-01-02 06:03:27, 2013-01-02 06:33:27, 13",
+            "Bil, 2013-01-02 06:33:27, 2013-01-02 07:01:27, 18",
+
+    })
+    void testOnlyOneFeeWithinOneHourRule(String vehicle, String date1, String date2, int expected) {
+        List<String> dates = new ArrayList<>();
+        dates.add(date1);
+        dates.add(date2);
+        assertEquals(expected, instance.getTax(DefaultVehicle.get(vehicle), dates));
     }
 
 
