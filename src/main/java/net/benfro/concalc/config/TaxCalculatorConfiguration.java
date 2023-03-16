@@ -18,6 +18,6 @@ public class TaxCalculatorConfiguration {
 
     @Bean
     public List<Vehicle> taxFreeVehicles() {
-        return taxFreeVehicleNames.stream().map(DefaultVehicle::get).collect(Collectors.toList());
+        return taxFreeVehicleNames.stream().map(DefaultVehicle::of).collect(Collectors.toList());
     }
 }

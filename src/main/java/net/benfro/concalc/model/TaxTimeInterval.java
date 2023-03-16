@@ -10,30 +10,43 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class TaxTimeInterval {
 
+    public static TaxTimeInterval of(String start, String end, int fee) {
+        return new TaxTimeInterval(start, end, fee);
+    }
+
     private static DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
 
-    private final LocalTime start;
-    private final LocalTime end;
+    private final LocalTime startTime;
+    private final LocalTime endTime;
     private final int taxRate;
 
-    public TaxTimeInterval(String start, String end, int taxRate) {
-        this.start = parse(start);
-        this.end = parse(end);
+    TaxTimeInterval(String startTime, String endTime, int taxRate) {
+        this.startTime = parse(startTime);
+        this.endTime = parse(endTime);
         this.taxRate = taxRate;
     }
 
-    LocalTime parse(String time) {
-        return LocalTime.parse(time, parser);
+    LocalTime parse(String timeStr) {
+        return LocalTime.parse(timeStr, parser);
     }
 
-    boolean isInInterval(String time) {
-        final LocalTime parse = parse(time);
-        return parse.isAfter(start.minusMinutes(1))
-                && parse.isBefore(end.plusMinutes(1));
+    boolean isInTimeInterval(String timeStr) {
+        final LocalTime localTime = parse(timeStr);
+        return isInTimeInterval(localTime);
     }
 
-    public int yield(String time) {
-        if(isInInterval(time)) return taxRate;
+    boolean isInTimeInterval(LocalTime time) {
+        return time.isAfter(startTime.minusMinutes(1))
+                && time.isBefore(endTime.plusMinutes(1));
+    }
+
+    public int yieldTaxRate(String time) {
+        if(isInTimeInterval(time)) return taxRate;
+        return 0;
+    }
+
+    public int yieldTaxRate(LocalTime time) {
+        if(isInTimeInterval(time)) return taxRate;
         return 0;
     }
 }

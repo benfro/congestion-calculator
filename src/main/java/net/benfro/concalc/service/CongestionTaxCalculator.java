@@ -1,6 +1,7 @@
-package net.benfro.concalc.model;
+package net.benfro.concalc.service;
 
 import lombok.RequiredArgsConstructor;
+import net.benfro.concalc.model.Vehicle;
 import net.benfro.concalc.service.TollFeeService;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,9 @@ public class CongestionTaxCalculator {
 
     private final TollFeeService tollFeeService;
 
-    public int getTax(Vehicle vehicle, List<String> dateTimes) {
+    public int getTax(Vehicle vehicle, List<String> dateTimesStrings) {
 
-        final LinkedList<LocalDateTime> sortedDateTimes = dateTimes
+        final LinkedList<LocalDateTime> sortedDateTimes = dateTimesStrings
                 .stream()
                 .map(this::getAsLocalDateTime)
                 .sorted(Comparator.naturalOrder())
@@ -27,13 +28,13 @@ public class CongestionTaxCalculator {
 
         // Get the ones within sixty minutes - return highest tax
         while (!sortedDateTimes.isEmpty()) {
-            final LocalDateTime latestDate = sortedDateTimes.pop();
-            final List<LocalDateTime> entriesWithinSixtyMinutes = findEntriesWithinSixtyMinutes(latestDate, sortedDateTimes);
+            final LocalDateTime firstDate = sortedDateTimes.pop();
+            final List<LocalDateTime> entriesWithinSixtyMinutes = findEntriesWithinSixtyMinutes(firstDate, sortedDateTimes);
             if (!entriesWithinSixtyMinutes.isEmpty()) {
                 totalTax += findMaxTaxFromEntries(entriesWithinSixtyMinutes, vehicle);
-                sortedDateTimes.clear();
+                sortedDateTimes.removeAll(entriesWithinSixtyMinutes);
             } else {
-                totalTax += tollFeeService.getTollFee(latestDate, vehicle);
+                totalTax += tollFeeService.getTollFee(firstDate, vehicle);
             }
         }
 

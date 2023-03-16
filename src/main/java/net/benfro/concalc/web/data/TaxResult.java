@@ -1,4 +1,4 @@
-package net.benfro.concalc.web;
+package net.benfro.concalc.web.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

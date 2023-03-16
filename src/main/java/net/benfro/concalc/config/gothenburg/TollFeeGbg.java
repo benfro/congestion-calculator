@@ -1,6 +1,7 @@
 package net.benfro.concalc.config.gothenburg;
 
 import lombok.RequiredArgsConstructor;
+import net.benfro.concalc.model.TaxTimeIntervals;
 import net.benfro.concalc.model.Vehicle;
 import net.benfro.concalc.ruleapi.TollFeeLookup;
 import org.springframework.stereotype.Component;
@@ -8,22 +9,13 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class TollFeeGbg implements TollFeeLookup {
+
+    private final TaxTimeIntervals intervals;
+
     @Override
     public int getTollFee(LocalDateTime incomingTime, Vehicle vehicle) {
-
-        int hour = incomingTime.getHour();
-        int minute = incomingTime.getMinute();
-
-        if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-        else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-        else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-        else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-        else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-        else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-        else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-        else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-        else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-        else return 0;
+        return intervals.getIntervals().stream().mapToInt(i -> i.yieldTaxRate(incomingTime.toLocalTime())).sum();
     }
 }

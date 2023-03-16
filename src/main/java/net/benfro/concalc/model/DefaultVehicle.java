@@ -1,12 +1,10 @@
 package net.benfro.concalc.model;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.Objects;
 
 public record DefaultVehicle(String vehicleType) implements Vehicle {
 
-    public static DefaultVehicle get(String vehicleType) {
+    public static DefaultVehicle of(String vehicleType) {
         return new DefaultVehicle(vehicleType);
     }
 
@@ -20,4 +18,8 @@ public record DefaultVehicle(String vehicleType) implements Vehicle {
         return Objects.equals(vehicleType, that.vehicleType);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(vehicleType);
+    }
 }

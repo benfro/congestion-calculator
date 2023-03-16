@@ -1,8 +1,10 @@
 package net.benfro.concalc.web;
 
 import lombok.RequiredArgsConstructor;
-import net.benfro.concalc.model.CongestionTaxCalculator;
+import net.benfro.concalc.service.CongestionTaxCalculator;
 import net.benfro.concalc.model.DefaultVehicle;
+import net.benfro.concalc.web.data.DateList;
+import net.benfro.concalc.web.data.TaxResult;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +17,7 @@ public class TaxCalculatorEndpoint {
 
     @PostMapping("tax")
     public TaxResult calculateTax(@RequestBody DateList dateList) {
-        final int tax = calculator.getTax(DefaultVehicle.get("Bil"), dateList.getDates());
+        final int tax = calculator.getTax(DefaultVehicle.of("Bil"), dateList.getDates());
         return new TaxResult(String.valueOf(tax));
     }
 

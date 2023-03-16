@@ -14,8 +14,8 @@ class TaxTimeIntervalTest {
     void testStringConstructor() {
         final TaxTimeInterval taxTimeInterval = new TaxTimeInterval("01:00", "12:27", 7);
         assertAll(
-                () -> assertEquals(LocalTime.of(1, 0), taxTimeInterval.getStart()),
-                () -> assertEquals(LocalTime.of(12, 27), taxTimeInterval.getEnd()),
+                () -> assertEquals(LocalTime.of(1, 0), taxTimeInterval.getStartTime()),
+                () -> assertEquals(LocalTime.of(12, 27), taxTimeInterval.getEndTime()),
                 () -> assertEquals(7, taxTimeInterval.getTaxRate())
         );
     }
@@ -30,7 +30,7 @@ class TaxTimeIntervalTest {
     })
     void testIsInInterval(String time, boolean expected) {
         final TaxTimeInterval taxTimeInterval = new TaxTimeInterval("01:00", "12:27", 7);
-        assertEquals(expected,taxTimeInterval.isInInterval(time));
+        assertEquals(expected,taxTimeInterval.isInTimeInterval(time));
     }
 
     @ParameterizedTest
@@ -40,6 +40,16 @@ class TaxTimeIntervalTest {
     })
     void testYield(String time, int expected) {
         final TaxTimeInterval taxTimeInterval = new TaxTimeInterval("01:00", "12:27", 7);
-        assertEquals(expected, taxTimeInterval.yield(time));
+        assertEquals(expected, taxTimeInterval.yieldTaxRate(time));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "01:05:00.0, 7",
+            "12:28:00.0, 0",
+    })
+    void testYieldLocalTime(LocalTime time, int expected) {
+        final TaxTimeInterval taxTimeInterval = new TaxTimeInterval("01:00", "12:27", 7);
+        assertEquals(expected, taxTimeInterval.yieldTaxRate(time));
     }
 }
