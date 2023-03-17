@@ -4,10 +4,16 @@ import lombok.RequiredArgsConstructor;
 import net.benfro.concalc.model.Vehicle;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @RequiredArgsConstructor
@@ -15,17 +21,23 @@ public class CongestionTaxCalculator {
 
     private final TollFeeService tollFeeService;
 
-    public int getTax(Vehicle vehicle, List<String> dateTimesStrings) {
+    public int calculate(Vehicle vehicle, List<String> dateTimesStrings) {
 
-        final LinkedList<LocalDateTime> sortedDateTimes = dateTimesStrings
+        Map<LocalDate, LinkedList<LocalDateTime>> groupedByDate =
+                dateTimesStrings
+                        .stream()
+                        .map(this::getAsLocalDateTime)
+                        .sorted(Comparator.naturalOrder())
+                        .collect(groupingBy(LocalDateTime::toLocalDate, Collectors.toCollection(LinkedList::new)));
+
+        return groupedByDate.values()
                 .stream()
-                .map(this::getAsLocalDateTime)
-                .sorted(Comparator.naturalOrder())
-                .collect(Collectors.toCollection(LinkedList::new));
+                .mapToInt(list -> calculateForDay(vehicle, list))
+                .sum();
+    }
 
+    private int calculateForDay(Vehicle vehicle, LinkedList<LocalDateTime> sortedDateTimes) {
         int totalTax = 0;
-
-        // Get the ones within sixty minutes - return highest tax
         while (!sortedDateTimes.isEmpty()) {
             final LocalDateTime firstDate = sortedDateTimes.pop();
             final List<LocalDateTime> entriesWithinSixtyMinutes = findEntriesWithinSixtyMinutes(firstDate, sortedDateTimes);

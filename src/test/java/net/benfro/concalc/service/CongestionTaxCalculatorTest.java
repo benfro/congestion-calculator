@@ -4,8 +4,6 @@ import net.benfro.concalc.model.DefaultVehicle;
 import net.benfro.concalc.ruleapi.TollFeeLookup;
 import net.benfro.concalc.ruleapi.TollFreeDateLookup;
 import net.benfro.concalc.ruleapi.TollFreeVehicleLookup;
-import net.benfro.concalc.service.CongestionTaxCalculator;
-import net.benfro.concalc.service.TollFeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,10 +32,12 @@ class CongestionTaxCalculatorTest {
     TollFeeLookup tollFeeLookup;
 
     CongestionTaxCalculator instance;
+    List<String> dates;
 
     @BeforeEach
     void setUp() {
         instance = new CongestionTaxCalculator(new TollFeeService(tollFreeDateLookup, taxFreeVehicles, tollFeeLookup));
+        dates = new ArrayList<>();
     }
 
 
@@ -51,10 +51,9 @@ class CongestionTaxCalculatorTest {
             "Bil, 2013-01-03 07:01:27, 2013-01-02 06:33:27, 31", // Two consecutive dates - Unsorted
     })
     void testAdditiveFee(String vehicle, String date1, String date2, int expected) {
-        List<String> dates = new ArrayList<>();
         dates.add(date1);
         dates.add(date2);
-        assertEquals(expected, instance.getTax(DefaultVehicle.of(vehicle), dates));
+        assertEquals(expected, instance.calculate(DefaultVehicle.of(vehicle), dates));
     }
 
     @ParameterizedTest
@@ -64,28 +63,79 @@ class CongestionTaxCalculatorTest {
 
     })
     void testOnlyOneFeeWithinOneHourRule(String vehicle, String date1, String date2, int expected) {
-        List<String> dates = List.of(date1, date2);
-        assertEquals(expected, instance.getTax(DefaultVehicle.of(vehicle), dates));
+        dates = List.of(date1, date2);
+        assertEquals(expected, instance.calculate(DefaultVehicle.of(vehicle), dates));
     }
 
 
     @Test
     @DisplayName("Three passages, all within 60 minutes - the greatest fee returned")
     void testBiggestFeeReturnedWithinSixtyMinutes() {
-        List<String> dates = new ArrayList<>();
         dates.add("2013-01-02 06:03:27"); // 8
         dates.add("2013-01-02 06:33:27"); // 13
         dates.add("2013-01-02 07:02:00"); // 18
-        assertEquals(18, instance.getTax(DefaultVehicle.of("Bil"), dates));
+        assertEquals(18, instance.calculate(DefaultVehicle.of("Bil"), dates));
     }
     @Test
     @DisplayName("Four passages, first three within 60 minutes = 18 and one more 18")
-    void testThree() {
-        List<String> dates = new ArrayList<>();
+    void testSixtyMinuteRulePlusOneEntry() {
         dates.add("2013-01-02 06:03:27");
         dates.add("2013-01-02 06:33:27");
         dates.add("2013-01-02 07:02:00");
         dates.add("2013-01-02 07:05:00");
-        assertEquals(18*2, instance.getTax(DefaultVehicle.of("Bil"), dates));
+        assertEquals(18*2, instance.calculate(DefaultVehicle.of("Bil"), dates));
+    }
+
+
+    @Test
+    @DisplayName("Passages that exceeds day maximum but always fall back at it")
+    void testMaxAmountForDayApplies() {
+        dates.add("2013-01-02 07:05:00"); // 18
+        dates.add("2013-01-02 15:31:00"); // 18
+        dates.add("2013-01-02 10:30:00"); // 8
+        dates.add("2013-01-02 11:31:00"); // 8
+        dates.add("2013-01-02 12:32:00"); // 8
+        dates.add("2013-01-02 13:33:00"); // 8
+        dates.add("2013-01-02 14:34:00"); // 8
+        assertEquals(60, instance.calculate(DefaultVehicle.of("Bil"), dates));
+    }
+
+    @Test
+    @DisplayName("Passages that exceeds day maximum but always fall back at it")
+    void testMaxAmountForDayAppliesDuringTwoDays() {
+        dates.add("2013-01-02 07:05:00"); // 18
+        dates.add("2013-01-02 15:31:00"); // 18
+        dates.add("2013-01-02 10:30:00"); // 8
+        dates.add("2013-01-02 11:31:00"); // 8
+        dates.add("2013-01-02 12:32:00"); // 8
+        dates.add("2013-01-02 13:33:00"); // 8
+        dates.add("2013-01-02 14:34:00"); // 8
+        dates.add("2013-01-03 07:05:00"); // 18
+        dates.add("2013-01-03 15:31:00"); // 18
+        dates.add("2013-01-03 10:30:00"); // 8
+        dates.add("2013-01-03 11:31:00"); // 8
+        dates.add("2013-01-03 12:32:00"); // 8
+        dates.add("2013-01-03 13:33:00"); // 8
+        dates.add("2013-01-03 14:34:00"); // 8
+        assertEquals(60*2, instance.calculate(DefaultVehicle.of("Bil"), dates));
+    }
+
+    @Test
+    @DisplayName("Passages that exceeds day maximum day one but not day two")
+    void testTwoDaysSecondDayNotMaxAmount() {
+        dates.add("2013-01-02 07:05:00"); // 18
+        dates.add("2013-01-02 15:31:00"); // 18
+        dates.add("2013-01-02 10:30:00"); // 8
+        dates.add("2013-01-02 11:31:00"); // 8
+        dates.add("2013-01-02 12:32:00"); // 8
+        dates.add("2013-01-02 13:33:00"); // 8
+        dates.add("2013-01-02 14:34:00"); // 8
+        dates.add("2013-01-03 07:05:00"); // 18
+        dates.add("2013-01-03 10:30:00"); // 8
+        dates.add("2013-01-03 11:31:00"); // 8
+        dates.add("2013-01-03 12:32:00"); // 8
+        dates.add("2013-01-03 13:33:00"); // 8
+        dates.add("2013-01-03 14:34:00"); // 8
+        assertEquals(60+58, instance.calculate(DefaultVehicle.of("Bil"), dates));
     }
 }

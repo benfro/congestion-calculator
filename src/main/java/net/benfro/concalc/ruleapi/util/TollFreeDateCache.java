@@ -12,10 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
- * A component that caches toll free days if needed.
+ * A component that caches toll-free days if needed. Dependent on custom implementation of TollFreeDateCacheLoadingRule.
  */
 @Component
 public class TollFreeDateCache {

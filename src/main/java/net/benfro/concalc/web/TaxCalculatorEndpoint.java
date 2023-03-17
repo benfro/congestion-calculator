@@ -17,7 +17,7 @@ public class TaxCalculatorEndpoint {
 
     @PostMapping("tax")
     public TaxResult calculateTax(@RequestBody DateList dateList) {
-        final int tax = calculator.getTax(DefaultVehicle.of("Bil"), dateList.getDates());
+        final int tax = calculator.calculate(DefaultVehicle.of("Bil"), dateList.getDates());
         return new TaxResult(String.valueOf(tax));
     }
 
