@@ -1,6 +1,12 @@
 package net.benfro.concalc.ruleapi;
 
+import net.benfro.concalc.model.StandardHolidays;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implement this interface to provide lookup for localized rules concerning
@@ -8,4 +14,6 @@ import java.time.LocalDate;
  */
 public interface TollFreeDateLookup {
     boolean isTollFreeDate(LocalDate date);
+
+
 }

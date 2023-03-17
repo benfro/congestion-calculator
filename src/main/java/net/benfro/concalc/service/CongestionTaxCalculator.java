@@ -2,7 +2,6 @@ package net.benfro.concalc.service;
 
 import lombok.RequiredArgsConstructor;
 import net.benfro.concalc.model.Vehicle;
-import net.benfro.concalc.service.TollFeeService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
