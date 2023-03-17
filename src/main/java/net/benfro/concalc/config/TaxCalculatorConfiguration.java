@@ -20,4 +20,9 @@ public class TaxCalculatorConfiguration {
     public List<Vehicle> taxFreeVehicles() {
         return taxFreeVehicleNames.stream().map(DefaultVehicle::of).collect(Collectors.toList());
     }
+
+    @Bean
+    public int maxTaxPerDay() {
+        return maxTaxPerDay;
+    }
 }

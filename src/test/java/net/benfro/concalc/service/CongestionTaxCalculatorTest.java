@@ -31,12 +31,15 @@ class CongestionTaxCalculatorTest {
     @Autowired
     TollFeeLookup tollFeeLookup;
 
+    @Autowired
+    int maxTaxPerDay;
+
     CongestionTaxCalculator instance;
     List<String> dates;
 
     @BeforeEach
     void setUp() {
-        instance = new CongestionTaxCalculator(new TollFeeService(tollFreeDateLookup, taxFreeVehicles, tollFeeLookup));
+        instance = new CongestionTaxCalculator(new TollFeeService(tollFreeDateLookup, taxFreeVehicles, tollFeeLookup),maxTaxPerDay);
         dates = new ArrayList<>();
     }
 

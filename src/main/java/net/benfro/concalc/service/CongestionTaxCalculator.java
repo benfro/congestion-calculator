@@ -21,6 +21,8 @@ public class CongestionTaxCalculator {
 
     private final TollFeeService tollFeeService;
 
+    private final int maxTaxPerDay;
+
     public int calculate(Vehicle vehicle, List<String> dateTimesStrings) {
 
         Map<LocalDate, LinkedList<LocalDateTime>> groupedByDate =
@@ -49,7 +51,7 @@ public class CongestionTaxCalculator {
             }
         }
 
-        return Math.min(totalTax, 60);
+        return Math.min(totalTax, maxTaxPerDay);
     }
 
     private int findMaxTaxFromEntries(List<LocalDateTime> entriesWithinSixtyMinutes, Vehicle vehicle) {
